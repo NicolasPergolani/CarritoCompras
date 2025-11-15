@@ -5,7 +5,7 @@ const { getItems, getItem, createItem, updateItem, deleteItem } = require('../co
 router.get('/', getItems);
 router.get('/:id', getItem);
 router.post('/', createItem);
-router.put('/:id', updateItem);
+router.patch('/:id', updateItem);
 router.delete('/:id', deleteItem);
 
 module.exports = router;

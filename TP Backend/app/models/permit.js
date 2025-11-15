@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const permitSchema = new mongoose.Schema({
-    nombre: {
+    name: {
         type: String,
         unique: true,
         required: true
