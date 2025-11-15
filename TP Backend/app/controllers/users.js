@@ -1,9 +1,25 @@
+const express = require('express');
+const router = express.Router();
+const authenticate = require('../middleware/auth');
+const bcrypt = require('bcryptjs');
+
 const User = require('../models/users');
+const { generateToken } = require('../utils/jwt');
 
 const createItem = async (req, res) => {
     try {
+        // Check if the role is 'admin'
+        if (req.body.role === 'admin') {
+            const existingAdmin = await User.findOne({ role: 'admin' });
+            if (existingAdmin) {
+                return res.status(403).json({ error: 'An admin user already exists. Cannot create more admins.' });
+            }
+        }
+
+        // Create the user
         const user = await User.create(req.body);
-        res.status(201).json(user);
+        const token = generateToken({ id: user._id, role: user.role }); // Generate JWT
+        res.status(201).json({ user, token });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -48,4 +64,28 @@ const deleteItem = async (req, res) => {
     }
 };
 
-module.exports = { getItems, getItem, createItem, updateItem, deleteItem };
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: 'Contraseña incorrecta' });
+        }
+
+        const token = generateToken({ id: user._id, role: user.role });
+        res.status(200).json({ token });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+router.post('/', authenticate, createItem); // Ensure auth middleware is applied
+
+module.exports = router;
+module.exports = { login, getItems, getItem, createItem, updateItem, deleteItem };
