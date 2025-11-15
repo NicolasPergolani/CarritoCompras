@@ -1,20 +1,30 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const app = express();
-const dbConnect = require('./config/mongo'); 
+const dbConnect = require('./config/mongo');
 
+const app = express();
+
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:5173' }));
+
+// Database connection
+dbConnect();
+
+// Routes - orden específico primero
+app.use('/permit', require('./app/routes/permit'));
+app.use('/product', require('./app/routes/product'));
+app.use('/users', require('./app/routes/users'));
+app.use('/', require('./app/routes/users')); // Para /login y /register
 
 const PORT = process.env.PORT || 3000;
 
-app.use('/', require('./app/routes/users'));
-app.use('/permit', require('./app/routes/permit'));
-dbConnect();
-
 app.listen(PORT, () => {
-    console.log(`Corriendo en puerto ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
 
-module.exports = { dbConnect, app };
+module.exports = app;

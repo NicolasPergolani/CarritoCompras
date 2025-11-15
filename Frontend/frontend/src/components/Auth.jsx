@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
 
 const Auth = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -36,7 +38,24 @@ const Auth = () => {
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        alert('Success!');
+        
+        // Decode JWT token to get user role
+        try {
+          const tokenPayload = JSON.parse(atob(data.token.split('.')[1]));
+          console.log('Token payload:', tokenPayload); // Debug log
+          const userRole = tokenPayload.role;
+          console.log('User role:', userRole); // Debug log
+          
+          // Redirect based on user role
+          if (userRole === 'admin') {
+            navigate('/admin');
+          } else {
+            navigate('/user');
+          }
+        } catch (decodeError) {
+          console.error('Error decoding token:', decodeError);
+          alert('Login successful, but failed to redirect. Please refresh the page.');
+        }
       } else {
         alert(data.error || 'An error occurred');
       }

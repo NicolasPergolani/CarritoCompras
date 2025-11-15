@@ -9,8 +9,8 @@ const { generateToken } = require('../utils/jwt');
 const createItem = async (req, res) => {
     try {
         // Check if the role is 'admin'
-        if (req.body.role === 'admin') {
-            const existingAdmin = await User.findOne({ role: 'admin' });
+        if (req.body.rol === 'admin') {
+            const existingAdmin = await User.findOne({ rol: 'admin' });
             if (existingAdmin) {
                 return res.status(403).json({ error: 'An admin user already exists. Cannot create more admins.' });
             }
@@ -18,7 +18,7 @@ const createItem = async (req, res) => {
 
         // Create the user
         const user = await User.create(req.body);
-        const token = generateToken({ id: user._id, role: user.role }); // Generate JWT
+        const token = generateToken({ id: user._id, role: user.rol }); // Generate JWT
         res.status(201).json({ user, token });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -78,7 +78,7 @@ const login = async (req, res) => {
             return res.status(401).json({ error: 'Contraseña incorrecta' });
         }
 
-        const token = generateToken({ id: user._id, role: user.role });
+        const token = generateToken({ id: user._id, role: user.rol });
         res.status(200).json({ token });
     } catch (error) {
         res.status(500).json({ error: error.message });

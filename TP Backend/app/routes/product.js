@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { getProducts, getProduct, createProduct, updateProduct, deleteProduct } = require('../controllers/product');
+const authenticate = require('../middleware/auth');
 const checkAdmin = require('../middleware/checkAdmin');
-const bcrypt = require('bcryptjs');
 
-// Define product routes
-router.get('/', getProducts);
-router.get('/:id', getProduct);
-router.post('/', checkAdmin, createProduct); // Admin only
-router.patch('/:id', checkAdmin, updateProduct); // Admin only
-router.delete('/:id', checkAdmin, deleteProduct); // Admin only
+router.get('/', authenticate, getProducts);
+router.get('/:id', authenticate, getProduct);
+router.post('/', authenticate, checkAdmin, createProduct);
+router.patch('/:id', authenticate, checkAdmin, updateProduct);
+router.delete('/:id', authenticate, checkAdmin, deleteProduct);
 
 module.exports = router;
