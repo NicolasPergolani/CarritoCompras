@@ -54,4 +54,39 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-module.exports = { getProducts, getProduct, createProduct, updateProduct, deleteProduct };
+// Get products with available stock
+const getAvailableProducts = async (req, res) => {
+    try {
+        const products = await Product.find({ stock: { $gt: 0 } });
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Update product stock
+const updateStock = async (req, res) => {
+    try {
+        const { stock } = req.body;
+        
+        if (stock < 0) {
+            return res.status(400).json({ error: 'Stock cannot be negative' });
+        }
+        
+        const product = await Product.findByIdAndUpdate(
+            req.params.id,
+            { stock: stock },
+            { new: true, runValidators: true }
+        );
+        
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        
+        res.json(product);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+module.exports = { getProducts, getProduct, createProduct, updateProduct, deleteProduct, getAvailableProducts, updateStock };

@@ -16,7 +16,14 @@ const productSchema = new mongoose.Schema({
     stock: {
         type: Number,
         required: true,
-        default: 0
+        default: 0,
+        min: [0, 'Stock cannot be negative'],
+        validate: {
+            validator: function(v) {
+                return v >= 0;
+            },
+            message: 'Stock must be a non-negative number'
+        }
     }
 }, {
     timestamps: true

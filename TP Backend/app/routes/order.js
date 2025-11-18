@@ -1,12 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const { getOrders, getOrder, createOrder, addProductToOrder, removeProductFromOrder } = require('../controllers/order');
+const authenticate = require('../middleware/auth');
+const checkAdmin = require('../middleware/checkAdmin');
+const { 
+    getOrders, 
+    getOrder, 
+    createOrder, 
+    addProductToOrder, 
+    removeProductFromOrder,
+    getUserOrders,
+    updateOrderStatus
+} = require('../controllers/order');
 
 // Define order routes
-router.get('/', getOrders);
-router.get('/:id', getOrder);
-router.post('/', createOrder);
-router.patch('/:id/add-product', addProductToOrder);
-router.patch('/:id/remove-product', removeProductFromOrder);
+router.get('/', authenticate, checkAdmin, getOrders); // Solo admin puede ver todas las órdenes
+router.get('/my-orders', authenticate, getUserOrders); // Usuario ve sus órdenes
+router.get('/:id', authenticate, getOrder);
+router.post('/', authenticate, createOrder); // Requiere autenticación para crear orden
+router.patch('/:id/add-product', authenticate, addProductToOrder);
+router.patch('/:id/remove-product', authenticate, removeProductFromOrder);
+router.patch('/:id/status', authenticate, checkAdmin, updateOrderStatus); // Solo admin puede cambiar estado
 
 module.exports = router;

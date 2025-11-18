@@ -18,7 +18,7 @@ const createItem = async (req, res) => {
 
         // Create the user
         const user = await User.create(req.body);
-        const token = generateToken({ id: user._id, role: user.rol }); // Generate JWT
+        const token = generateToken({ id: user._id, rol: user.rol }); // Generate JWT
         res.status(201).json({ user, token });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -78,14 +78,11 @@ const login = async (req, res) => {
             return res.status(401).json({ error: 'Contraseña incorrecta' });
         }
 
-        const token = generateToken({ id: user._id, role: user.rol });
+        const token = generateToken({ id: user._id, rol: user.rol });
         res.status(200).json({ token });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-router.post('/', authenticate, createItem); // Ensure auth middleware is applied
-
-module.exports = router;
 module.exports = { login, getItems, getItem, createItem, updateItem, deleteItem };

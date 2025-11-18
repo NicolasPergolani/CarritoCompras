@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users',
+        required: true
+    },
     products: [
         {
             product: {
@@ -12,6 +17,10 @@ const orderSchema = new mongoose.Schema({
                 type: Number,
                 required: true,
                 min: 1
+            },
+            price: {
+                type: Number,
+                required: true
             }
         }
     ],
@@ -20,20 +29,27 @@ const orderSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
+    status: {
+        type: String,
+        enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+        default: 'pending'
+    },
     createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
         type: Date,
         default: Date.now
     }
 });
 
-// Calculate total price before saving
-orderSchema.pre('save', async function (next) {
-    try {
-        this.totalPrice = this.products.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-        next();
-    } catch (err) {
-        next(err);
-    }
+// Update the updatedAt field before saving
+orderSchema.pre('save', function (next) {
+    this.updatedAt = new Date();
+    // Calculate total price from stored prices
+    this.totalPrice = this.products.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    next();
 });
 
 module.exports = mongoose.model('Order', orderSchema);

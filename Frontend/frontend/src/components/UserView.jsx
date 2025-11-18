@@ -5,6 +5,9 @@ const UserView = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [error, setError] = useState('');
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState(null);
+  const [showOrderSuccess, setShowOrderSuccess] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -73,6 +76,138 @@ const UserView = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
   };
 
+  const handleCheckout = async () => {
+    if (cart.length === 0) {
+      alert('Your cart is empty');
+      return;
+    }
+
+    setIsCheckingOut(true);
+    setError('');
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Prepare the order data
+      const orderData = {
+        products: cart.map(item => ({
+          product: item._id,
+          quantity: item.quantity
+        }))
+      };
+
+      const response = await fetch(`${API_URL}/order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (response.ok) {
+        const order = await response.json();
+        setCurrentOrder(order);
+        setShowOrderSuccess(true);
+        setCart([]); // Clear cart after successful order
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Error creating order');
+      }
+    } catch (error) {
+      setError('Error connecting to server');
+      console.error('Error creating order:', error);
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
+  // Order Success Modal Component
+  const OrderSuccessModal = () => (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '30px',
+        borderRadius: '8px',
+        maxWidth: '600px',
+        width: '90%',
+        maxHeight: '80%',
+        overflow: 'auto'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>✅ Order Created Successfully!</h2>
+          <p style={{ color: '#666' }}>Your order has been placed and is being processed.</p>
+        </div>
+
+        {currentOrder && (
+          <div>
+            <h3>Order Details:</h3>
+            <div style={{ backgroundColor: '#f5f5f5', padding: '15px', borderRadius: '4px', marginBottom: '15px' }}>
+              <p><strong>Order ID:</strong> {currentOrder._id}</p>
+              <p><strong>Status:</strong> <span style={{ color: '#ff9800', fontWeight: 'bold' }}>{currentOrder.status}</span></p>
+              <p><strong>Total:</strong> <span style={{ color: '#4caf50', fontWeight: 'bold' }}>${currentOrder.totalPrice}</span></p>
+              <p><strong>Date:</strong> {new Date(currentOrder.createdAt).toLocaleString()}</p>
+            </div>
+
+            <h4>Products:</h4>
+            {currentOrder.products && currentOrder.products.map((item, index) => (
+              <div key={index} style={{ 
+                border: '1px solid #ddd', 
+                padding: '10px', 
+                borderRadius: '4px',
+                marginBottom: '10px'
+              }}>
+                <p><strong>{item.product?.name || item.product?.description || 'Product'}</strong></p>
+                <p>Quantity: {item.quantity}</p>
+                <p>Price: ${item.price}</p>
+                <p><strong>Subtotal: ${(item.price * item.quantity).toFixed(2)}</strong></p>
+              </div>
+            ))}
+
+            {currentOrder.user && (
+              <div style={{ marginTop: '15px', backgroundColor: '#e3f2fd', padding: '10px', borderRadius: '4px' }}>
+                <h4>Customer Information:</h4>
+                <p><strong>Name:</strong> {currentOrder.user.name} {currentOrder.user.lastName}</p>
+                <p><strong>Email:</strong> {currentOrder.user.email}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <button
+            onClick={() => {
+              setShowOrderSuccess(false);
+              setCurrentOrder(null);
+            }}
+            style={{
+              backgroundColor: '#2196f3',
+              color: 'white',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '1em'
+            }}
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>User View - Products</h1>
@@ -88,6 +223,8 @@ const UserView = () => {
           {error}
         </div>
       )}
+
+      {showOrderSuccess && <OrderSuccessModal />}
 
       <div style={{ display: 'flex', gap: '20px' }}>
         {/* Products Section */}
@@ -236,20 +373,22 @@ const UserView = () => {
               }}>
                 <h3>Total: ${getTotalPrice()}</h3>
                 <button
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
                   style={{
                     width: '100%',
                     padding: '15px',
-                    backgroundColor: '#2196f3',
+                    backgroundColor: isCheckingOut ? '#ccc' : '#2196f3',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
-                    cursor: 'pointer',
+                    cursor: isCheckingOut ? 'not-allowed' : 'pointer',
                     fontSize: '1.1em',
                     fontWeight: 'bold',
                     marginTop: '10px'
                   }}
                 >
-                  Checkout
+                  {isCheckingOut ? 'Processing...' : 'Checkout'}
                 </button>
               </div>
             </>

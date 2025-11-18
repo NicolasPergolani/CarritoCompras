@@ -43,7 +43,7 @@ const Auth = () => {
         try {
           const tokenPayload = JSON.parse(atob(data.token.split('.')[1]));
           console.log('Token payload:', tokenPayload); // Debug log
-          const userRole = tokenPayload.role;
+          const userRole = tokenPayload.rol; // Cambié 'role' por 'rol' para coincidir con el backend
           console.log('User role:', userRole); // Debug log
           
           // Redirect based on user role

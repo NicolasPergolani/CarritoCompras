@@ -16,10 +16,10 @@ app.use(express.json());
 dbConnect();
 
 // Routes - orden específico primero
-app.use('/permit', require('./app/routes/permit'));
+app.use('/order', require('./app/routes/order'));
 app.use('/product', require('./app/routes/product'));
 app.use('/users', require('./app/routes/users'));
-app.use('/', require('./app/routes/users')); // Para /login y /register
+app.use('/', require('./app/routes/users')); // Para /login y /register en la raíz
 
 const PORT = process.env.PORT || 3000;
 
