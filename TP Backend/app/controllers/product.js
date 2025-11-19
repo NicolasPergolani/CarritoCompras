@@ -54,7 +54,7 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-// Get products with available stock
+
 const getAvailableProducts = async (req, res) => {
     try {
         const products = await Product.find({ stock: { $gt: 0 } });
@@ -64,7 +64,7 @@ const getAvailableProducts = async (req, res) => {
     }
 };
 
-// Update product stock
+
 const updateStock = async (req, res) => {
     try {
         const { stock } = req.body;

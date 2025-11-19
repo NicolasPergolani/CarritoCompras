@@ -1,4 +1,4 @@
-// Middleware to check if the user has admin permissions
+
 function checkAdmin(req, res, next) {
     if (req.user && req.user.rol === 'admin') {
         return next();

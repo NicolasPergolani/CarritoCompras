@@ -8,10 +8,19 @@ const UserView = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState('products');
+  const [userOrders, setUserOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'orders') {
+      fetchUserOrders();
+    }
+  }, [activeTab]);
 
   const fetchProducts = async () => {
     try {
@@ -39,6 +48,50 @@ const UserView = () => {
     } catch (error) {
       setError('Error connecting to server');
       console.error('Error fetching products:', error);
+    }
+  };
+
+  const fetchUserOrders = async () => {
+    setLoadingOrders(true);
+    setError(''); // Clear any previous errors
+    try {
+      const token = localStorage.getItem('token');
+      console.log('🔍 Fetching user orders with token:', token ? 'Token exists' : 'No token');
+      
+      const response = await fetch(`${API_URL}/order/my-orders`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log('📡 Orders API response status:', response.status);
+      console.log('📡 Orders API response headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ User orders data received:', data);
+        console.log('📊 Orders count:', Array.isArray(data) ? data.length : 'Not an array');
+        
+        if (Array.isArray(data)) {
+          setUserOrders(data);
+          console.log('🔄 Orders state updated with', data.length, 'orders');
+        } else {
+          setUserOrders([]);
+          console.error('❌ Orders is not an array:', data);
+          setError('Invalid data format received from server');
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ Error response:', response.status, errorData);
+        setError(errorData.error || `Error loading orders (${response.status})`);
+        setUserOrders([]);
+      }
+    } catch (error) {
+      console.error('💥 Exception fetching user orders:', error);
+      setError('Error connecting to server: ' + error.message);
+      setUserOrders([]);
+    } finally {
+      setLoadingOrders(false);
     }
   };
 
@@ -110,6 +163,10 @@ const UserView = () => {
         setCurrentOrder(order);
         setShowOrderSuccess(true);
         setCart([]); // Clear cart after successful order
+        // Refresh orders if user is on orders tab
+        if (activeTab === 'orders') {
+          fetchUserOrders();
+        }
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'Error creating order');
@@ -147,20 +204,20 @@ const UserView = () => {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>✅ Order Created Successfully!</h2>
-          <p style={{ color: '#666' }}>Your order has been placed and is being processed.</p>
+          <p style={{ color: '#000' }}>Your order has been placed and is being processed.</p>
         </div>
 
         {currentOrder && (
           <div>
-            <h3>Order Details:</h3>
+            <h3 style={{ color: '#000' }}>Order Details:</h3>
             <div style={{ backgroundColor: '#f5f5f5', padding: '15px', borderRadius: '4px', marginBottom: '15px' }}>
-              <p><strong>Order ID:</strong> {currentOrder._id}</p>
-              <p><strong>Status:</strong> <span style={{ color: '#ff9800', fontWeight: 'bold' }}>{currentOrder.status}</span></p>
-              <p><strong>Total:</strong> <span style={{ color: '#4caf50', fontWeight: 'bold' }}>${currentOrder.totalPrice}</span></p>
-              <p><strong>Date:</strong> {new Date(currentOrder.createdAt).toLocaleString()}</p>
+              <p style={{ color: '#000' }}><strong>Order ID:</strong> {currentOrder._id}</p>
+              <p style={{ color: '#000' }}><strong>Status:</strong> <span style={{ color: '#ff9800', fontWeight: 'bold' }}>{currentOrder.status}</span></p>
+              <p style={{ color: '#000' }}><strong>Total:</strong> <span style={{ color: '#4caf50', fontWeight: 'bold' }}>${currentOrder.totalPrice}</span></p>
+              <p style={{ color: '#000' }}><strong>Date:</strong> {new Date(currentOrder.createdAt).toLocaleString()}</p>
             </div>
 
-            <h4>Products:</h4>
+            <h4 style={{ color: '#000' }}>Products:</h4>
             {currentOrder.products && currentOrder.products.map((item, index) => (
               <div key={index} style={{ 
                 border: '1px solid #ddd', 
@@ -168,18 +225,18 @@ const UserView = () => {
                 borderRadius: '4px',
                 marginBottom: '10px'
               }}>
-                <p><strong>{item.product?.name || item.product?.description || 'Product'}</strong></p>
-                <p>Quantity: {item.quantity}</p>
-                <p>Price: ${item.price}</p>
-                <p><strong>Subtotal: ${(item.price * item.quantity).toFixed(2)}</strong></p>
+                <p style={{ color: '#000' }}><strong>{item.product?.name || item.product?.description || 'Product'}</strong></p>
+                <p style={{ color: '#000' }}>Quantity: {item.quantity}</p>
+                <p style={{ color: '#000' }}>Price: ${item.price}</p>
+                <p style={{ color: '#000' }}><strong>Subtotal: ${(item.price * item.quantity).toFixed(2)}</strong></p>
               </div>
             ))}
 
             {currentOrder.user && (
               <div style={{ marginTop: '15px', backgroundColor: '#e3f2fd', padding: '10px', borderRadius: '4px' }}>
-                <h4>Customer Information:</h4>
-                <p><strong>Name:</strong> {currentOrder.user.name} {currentOrder.user.lastName}</p>
-                <p><strong>Email:</strong> {currentOrder.user.email}</p>
+                <h4 style={{ color: '#000' }}>Customer Information:</h4>
+                <p style={{ color: '#000' }}><strong>Name:</strong> {currentOrder.user.name} {currentOrder.user.lastName}</p>
+                <p style={{ color: '#000' }}><strong>Email:</strong> {currentOrder.user.email}</p>
               </div>
             )}
           </div>
@@ -209,8 +266,8 @@ const UserView = () => {
   );
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>User View - Products</h1>
+    <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+      <h1>User Dashboard</h1>
       
       {error && (
         <div style={{ 
@@ -226,7 +283,48 @@ const UserView = () => {
 
       {showOrderSuccess && <OrderSuccessModal />}
 
-      <div style={{ display: 'flex', gap: '20px' }}>
+      {/* Tabs Navigation */}
+      <div style={{ 
+        marginBottom: '30px', 
+        borderBottom: '2px solid #ddd',
+        display: 'flex',
+        gap: '0'
+      }}>
+        <button 
+          onClick={() => setActiveTab('products')}
+          style={{
+            backgroundColor: activeTab === 'products' ? '#007bff' : 'transparent',
+            color: activeTab === 'products' ? 'white' : '#007bff',
+            border: 'none',
+            padding: '15px 30px',
+            cursor: 'pointer',
+            borderBottom: activeTab === 'products' ? 'none' : '2px solid transparent',
+            fontSize: '16px',
+            fontWeight: 'bold'
+          }}
+        >
+          Products & Shopping
+        </button>
+        <button 
+          onClick={() => setActiveTab('orders')}
+          style={{
+            backgroundColor: activeTab === 'orders' ? '#007bff' : 'transparent',
+            color: activeTab === 'orders' ? 'white' : '#007bff',
+            border: 'none',
+            padding: '15px 30px',
+            cursor: 'pointer',
+            borderBottom: activeTab === 'orders' ? 'none' : '2px solid transparent',
+            fontSize: '16px',
+            fontWeight: 'bold'
+          }}
+        >
+          My Orders
+        </button>
+      </div>
+
+      {/* Products Tab */}
+      {activeTab === 'products' && (
+        <div style={{ display: 'flex', gap: '20px' }}>
         {/* Products Section */}
         <div style={{ flex: 2 }}>
           <h2>Available Products</h2>
@@ -396,9 +494,118 @@ const UserView = () => {
             <p style={{ textAlign: 'center', color: '#999' }}>
               Your cart is empty
             </p>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Orders Tab */}
+      {activeTab === 'orders' && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ color: '#000' }}>My Orders</h2>
+            <button 
+              onClick={fetchUserOrders}
+              disabled={loadingOrders}
+              style={{
+                backgroundColor: '#17a2b8',
+                color: 'white',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '5px',
+                cursor: loadingOrders ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {loadingOrders ? 'Loading...' : 'Refresh Orders'}
+            </button>
+          </div>
+          
+          <p style={{ color: '#000', marginBottom: '15px' }}>
+            Total orders: {userOrders.length}
+          </p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {loadingOrders ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <p style={{ fontSize: '18px', color: '#007bff' }}>
+                  🔄 Loading your orders...
+                </p>
+              </div>
+            ) : Array.isArray(userOrders) && userOrders.length > 0 ? (
+              userOrders.map((order) => (
+                <div 
+                  key={order._id} 
+                  style={{ 
+                    border: '1px solid #ddd', 
+                    padding: '20px', 
+                    borderRadius: '10px',
+                    backgroundColor: 'white',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
+                    <div>
+                      <h3 style={{ margin: '0 0 10px 0', color: '#000' }}>Order #{order._id.slice(-6)}</h3>
+                      <p style={{ margin: '0', color: '#000' }}>
+                        Date: {new Date(order.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ margin: '0 0 10px 0', fontSize: '24px', fontWeight: 'bold', color: '#28a745' }}>
+                        ${order.totalPrice}
+                      </p>
+                      <span style={{
+                        padding: '5px 15px',
+                        borderRadius: '20px',
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                        color: '#000',
+                        backgroundColor: order.status === 'pending' ? '#fff3cd' : 
+                                       order.status === 'confirmed' ? '#d4edda' :
+                                       order.status === 'shipped' ? '#cce5ff' :
+                                       order.status === 'delivered' ? '#d1ecf1' : '#f8d7da'
+                      }}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <h4 style={{ marginBottom: '10px', color: '#000' }}>Products:</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '10px' }}>
+                    {order.products && order.products.map((item, index) => (
+                      <div 
+                        key={index}
+                        style={{ 
+                          border: '1px solid #eee', 
+                          padding: '10px', 
+                          borderRadius: '5px',
+                          backgroundColor: '#f9f9f9'
+                        }}
+                      >
+                        <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', color: '#000' }}>
+                          {item.product?.name || item.product?.description || 'Product'}
+                        </p>
+                        <p style={{ margin: '0', color: '#000' }}>
+                          Quantity: {item.quantity} × ${item.price} = ${(item.quantity * item.price).toFixed(2)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <p style={{ fontSize: '18px', color: '#000', marginBottom: '10px' }}>
+                  No orders found
+                </p>
+                <p style={{ color: '#666' }}>
+                  Start shopping to see your orders here!
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

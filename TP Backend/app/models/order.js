@@ -44,10 +44,10 @@ const orderSchema = new mongoose.Schema({
     }
 });
 
-// Update the updatedAt field before saving
+
 orderSchema.pre('save', function (next) {
     this.updatedAt = new Date();
-    // Calculate total price from stored prices
+    
     this.totalPrice = this.products.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     next();
 });

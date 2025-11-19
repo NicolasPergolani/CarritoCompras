@@ -8,7 +8,7 @@ const { generateToken } = require('../utils/jwt');
 
 const createItem = async (req, res) => {
     try {
-        // Check if the role is 'admin'
+        
         if (req.body.rol === 'admin') {
             const existingAdmin = await User.findOne({ rol: 'admin' });
             if (existingAdmin) {
@@ -16,9 +16,9 @@ const createItem = async (req, res) => {
             }
         }
 
-        // Create the user
+        
         const user = await User.create(req.body);
-        const token = generateToken({ id: user._id, rol: user.rol }); // Generate JWT
+        const token = generateToken({ id: user._id, rol: user.rol }); 
         res.status(201).json({ user, token });
     } catch (error) {
         res.status(400).json({ error: error.message });

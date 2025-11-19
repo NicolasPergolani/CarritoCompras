@@ -279,7 +279,7 @@ const AdminView = () => {
               borderRadius: '5px', 
               marginBottom: '20px' 
             }}>
-              <h3>Añadir Nuevo Producto</h3>
+              <h3 style={{ color: '#000' }}>Añadir Nuevo Producto</h3>
               <form onSubmit={handleSubmit}>
                 <div style={{ marginBottom: '10px' }}>
                   <textarea
@@ -374,15 +374,15 @@ const AdminView = () => {
                   )}
                   <div style={{ flex: 1 }}>
                     <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>Descripción</h3>
-                    <p style={{ margin: '0 0 15px 0', color: '#666' }}>{product.description}</p>
+                    <p style={{ margin: '0 0 15px 0', color: '#000' }}>{product.description}</p>
                     
                     <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
                       <div>
-                        <strong style={{ display: 'block', fontSize: '14px', color: '#666' }}>Precio</strong>
+                        <strong style={{ display: 'block', fontSize: '14px', color: '#000' }}>Precio</strong>
                         <span style={{ fontSize: '20px', color: '#28a745', fontWeight: 'bold' }}>${product.price}</span>
                       </div>
                       <div>
-                        <strong style={{ display: 'block', fontSize: '14px', color: '#666' }}>Stock</strong>
+                        <strong style={{ display: 'block', fontSize: '14px', color: '#000' }}>Stock</strong>
                         <span style={{ 
                           fontSize: '20px', 
                           fontWeight: 'bold',
@@ -456,7 +456,7 @@ const AdminView = () => {
               Refrescar Órdenes
             </button>
           </div>
-          <p style={{ color: '#666', marginBottom: '15px' }}>
+          <p style={{ color: '#000', marginBottom: '15px' }}>
             Total de órdenes: {orders.length}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -474,12 +474,12 @@ const AdminView = () => {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
                     <div>
-                      <h3 style={{ margin: '0 0 10px 0' }}>Orden #{order._id.slice(-6)}</h3>
-                      <p style={{ margin: '0', color: '#666' }}>
+                      <h3 style={{ margin: '0 0 10px 0', color: '#000' }}>Orden #{order._id.slice(-6)}</h3>
+                      <p style={{ margin: '0', color: '#000' }}>
                         Fecha: {new Date(order.createdAt).toLocaleString()}
                       </p>
                       {order.user && (
-                        <p style={{ margin: '5px 0 0 0', color: '#666' }}>
+                        <p style={{ margin: '5px 0 0 0', color: '#000' }}>
                           Cliente: {order.user.name} {order.user.lastName} ({order.user.email})
                         </p>
                       )}
@@ -495,6 +495,7 @@ const AdminView = () => {
                           padding: '5px 10px',
                           borderRadius: '4px',
                           border: '1px solid #ddd',
+                          color: '#000',
                           backgroundColor: order.status === 'pending' ? '#fff3cd' : 
                                          order.status === 'confirmed' ? '#d4edda' :
                                          order.status === 'shipped' ? '#cce5ff' :
@@ -510,7 +511,7 @@ const AdminView = () => {
                     </div>
                   </div>
                   
-                  <h4 style={{ marginBottom: '10px' }}>Productos:</h4>
+                  <h4 style={{ marginBottom: '10px', color: '#000' }}>Productos:</h4>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '10px' }}>
                     {order.products && order.products.map((item, index) => (
                       <div 
@@ -522,10 +523,10 @@ const AdminView = () => {
                           backgroundColor: '#f9f9f9'
                         }}
                       >
-                        <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>
+                        <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', color: '#000' }}>
                           {item.product?.name || item.product?.description || 'Producto'}
                         </p>
-                        <p style={{ margin: '0', color: '#666' }}>
+                        <p style={{ margin: '0', color: '#000' }}>
                           Cantidad: {item.quantity} × ${item.price} = ${(item.quantity * item.price).toFixed(2)}
                         </p>
                       </div>
@@ -534,7 +535,7 @@ const AdminView = () => {
                 </div>
               ))
             ) : (
-              <p style={{ textAlign: 'center', color: '#666', fontSize: '18px' }}>
+              <p style={{ textAlign: 'center', color: '#000', fontSize: '18px' }}>
                 No hay órdenes disponibles.
               </p>
             )}
@@ -568,7 +569,7 @@ const AdminView = () => {
             </h3>
             
             <div style={{ marginBottom: '20px' }}>
-              <p style={{ margin: '0 0 10px 0', color: '#666' }}>
+              <p style={{ margin: '0 0 10px 0', color: '#000' }}>
                 Stock actual: <strong>{selectedProduct.stock}</strong>
               </p>
               
