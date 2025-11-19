@@ -1,4 +1,4 @@
-OWNER 
+# OWNER 
 Carrito de Compras
 Un proyecto de ejemplo que implementa las funcionalidades básicas de un carrito de compras: 
 listado de productos, añadir/quitar productos del carrito, cálculo de totales y proceso de pago (simulado). 
@@ -33,7 +33,7 @@ npm install
 # backend
 cd "TP Backend"
 npm in
-COPILOT version
+# COPILOT version
 # 🛒 CarritoCompras - E-commerce Full Stack Application
 
 Una aplicación completa de e-commerce desarrollada con React + Vite (Frontend) y Node.js + Express + MongoDB (Backend).
