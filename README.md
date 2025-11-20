@@ -1,39 +1,3 @@
-# OWNER 
-Carrito de Compras
-Un proyecto de ejemplo que implementa las funcionalidades básicas de un carrito de compras: 
-listado de productos, añadir/quitar productos del carrito, cálculo de totales y proceso de pago (simulado). 
-
-
-
-Tabla de contenidos
-- Características funcionalidad basica de creacion de productos gestion de ordenes y de usuarios para simular el carrito.
-- Tecnologias desarrollo JWT para verificacion mediante middleware para el login. Realizado en MERN con un front basico realizado con IA para verificar funcionalidades y facilitar la visualizacion se realizo una conexion de DB a Atlas de mongo
-- Instalacion, realizar npm install en ambas carpetas de front y de back el .env es publico por el momento para la conexion a la base de datos (sera eliminado luego del traslado para la presentacio) y correr localmente simplemente con npm start y npm run dev.
-- Estructura del proyecto Monolito modular con ABM de usuarios productos y ordenes 
-- Modelo de datos Json MongoDB Atlas
-Características
-- Listado de productos (filtrado y búsqueda)
-- Añadir productos al carrito
-- Actualizar cantidad de artículos en el carrito
-- Eliminar artículos del carrito
-- Cálculo de subtotal y total
-- Proceso de checkout simulado con persistencia en ordenes visibles para el usuario (las propias) y el admin con cambio de status y visualizacion del total de las ordenes. 
-
-Tecnologías
-- Frontend: React, Vue
-- Backend: Node.js + Express
-- Base de datos: MongoDB
-- Autenticación: JWT 
-
-Instalar dependencias (ejemplo Node.js):
-# frontend
-cd frontend
-npm install
-
-# backend
-cd "TP Backend"
-npm in
-# COPILOT version
 # 🛒 CarritoCompras - E-commerce Full Stack Application
 
 Una aplicación completa de e-commerce desarrollada con React + Vite (Frontend) y Node.js + Express + MongoDB (Backend).

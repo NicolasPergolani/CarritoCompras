@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
 
 const UserView = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [error, setError] = useState('');
@@ -49,6 +51,15 @@ const UserView = () => {
       setError('Error connecting to server');
       console.error('Error fetching products:', error);
     }
+  };
+
+  const handleLogout = () => {
+    // Clear JWT token from localStorage
+    localStorage.removeItem('token');
+    // Clear any other user data
+    localStorage.clear();
+    // Navigate to login page
+    navigate('/');
   };
 
   const fetchUserOrders = async () => {
@@ -267,7 +278,24 @@ const UserView = () => {
 
   return (
     <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
-      <h1>User Dashboard</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h1>User Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          style={{
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 'bold'
+          }}
+        >
+          🚪 Logout
+        </button>
+      </div>
       
       {error && (
         <div style={{ 
