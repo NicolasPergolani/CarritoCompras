@@ -1,6 +1,6 @@
 const  express = require('express');
 const router = express.Router();
-const fs= requere('fs')
+const fs= require('fs')
 
 const pathRouter =` ${__dirname}`
 const removeExtension = (fileName) => {
