@@ -33,7 +33,7 @@ npm install
 cd "TP Backend"
 npm in
 
-# Copilot versio
+# Copilot version
 # 🛒 CarritoCompras - E-commerce Full Stack Application
 
 Una aplicación completa de e-commerce desarrollada con React + Vite (Frontend) y Node.js + Express + MongoDB (Backend).
